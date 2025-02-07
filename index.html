@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>רשימת קניות</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .input-container {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        #item-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        #add-button {
+            padding: 10px;
+            margin-left: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #add-button:hover {
+            background-color: #45a049;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-text {
+            font-weight: bold;
+            /* הסרנו margin-right: auto כדי שלא ידחק את הכפתורים לצד השני */
+        }
+
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .delete-button:hover {
+            background-color: #e53935;
+        }
+
+        .bought-button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .bought-button:hover {
+            background-color: #1976D2;
+        }
+
+        .bought {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        #share-button {
+            padding: 10px;
+            background-color: #25D366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+
+        #share-button:hover {
+            background-color: #20b954;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>רשימת קניות</h2>
+        <div class="input-container">
+            <input type="text" id="item-input" placeholder="הוסף פריט או רשימה של פריטים...">
+            <button id="add-button">הוסף</button>
+        </div>
+        <ul id="shopping-list"></ul>
+        <button id="share-button">שתף בווטסאפ</button>
+    </div>
+
+    <script>
+        document.getElementById('add-button').addEventListener('click', function() {
+            const itemInput = document.getElementById('item-input');
+            const rawInput = itemInput.value.trim();
+
+            if (rawInput !== '') {
+                const items = rawInput.split(/[\s,\.\n]+/);
+                items.forEach(item => {
+                    const trimmedItem = item.trim();
+                    if (trimmedItem !== '') {
+                        addItemToList(trimmedItem);
+                    }
+                });
+                itemInput.value = '';
+            }
+        });
+
+        document.getElementById('share-button').addEventListener('click', function() {
+            const items = document.querySelectorAll('#shopping-list li');
+            let itemList = 'רשימת קניות:\n';
+            items.forEach(item => {
+                const productText = item.querySelector('.item-text').textContent || '';
+                itemList += '- ' + productText + '\n';
+            });
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(itemList)}`;
+            window.open(whatsappUrl, '_blank');
+        });
+
+        function addItemToList(itemText) {
+            // li element
+            const listItem = document.createElement('li');
+
+            // span: מוצג כ"מוצר: ..."
+            const productSpan = document.createElement('span');
+            productSpan.classList.add('item-text');
+            productSpan.textContent = `מוצר: ${itemText}`;
+
+            // כפתור "מחק"
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'מחק';
+            deleteButton.classList.add('delete-button');
+            deleteButton.addEventListener('click', function() {
+                listItem.remove();
+            });
+
+            // כפתור "סמן שנקנה"
+            const boughtButton = document.createElement('button');
+            boughtButton.textContent = 'סמן שנקנה';
+            boughtButton.classList.add('bought-button');
+            boughtButton.addEventListener('click', function() {
+                productSpan.classList.toggle('bought');
+            });
+
+            // הוספת הכל ל-li
+            listItem.appendChild(productSpan);
+            listItem.appendChild(boughtButton);
+            listItem.appendChild(deleteButton);
+
+            // הוספה ל-ul
+            document.getElementById('shopping-list').appendChild(listItem);
+        }
+
+        // שמירת הנתונים ב-Local Storage
+        window.addEventListener('beforeunload', function() {
+            const items = document.querySelectorAll('#shopping-list li');
+            let itemList = [];
+
+            items.forEach(item => {
+                const productText = item.querySelector('.item-text');
+                itemList.push({
+                    text: productText ? productText.textContent.replace('מוצר: ', '') : '',
+                    bought: productText ? productText.classList.contains('bought') : false
+                });
+            });
+            localStorage.setItem('shoppingList', JSON.stringify(itemList));
+        });
+
+        // טעינת הנתונים מ-Local Storage
+        window.addEventListener('load', function() {
+            const savedItems = JSON.parse(localStorage.getItem('shoppingList')) || [];
+            savedItems.forEach(item => {
+                addItemToList(item.text);
+            });
+
+            // לאחר שנטענו הפריטים, סימון אלה שקנו
+            const items = document.querySelectorAll('#shopping-list li');
+            items.forEach(li => {
+                const productText = li.querySelector('.item-text');
+                const originalText = productText.textContent.replace('מוצר: ', '');
+                const savedItem = savedItems.find(i => i.text === originalText);
+                if (savedItem && savedItem.bought) {
+                    productText.classList.add('bought');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
