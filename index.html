@@ -77,7 +77,6 @@
 
         .item-text {
             font-weight: bold;
-            /* הסרנו margin-right: auto כדי שלא ידחק את הכפתורים לצד השני */
         }
 
         .delete-button {
@@ -135,7 +134,7 @@
     <div class="container">
         <h2>רשימת קניות</h2>
         <div class="input-container">
-            <input type="text" id="item-input" placeholder="הוסף פריט או רשימה של פריטים...">
+            <input type="text" id="item-input" placeholder="הוסף פריט...">
             <button id="add-button">הוסף</button>
         </div>
         <ul id="shopping-list"></ul>
@@ -148,13 +147,8 @@
             const rawInput = itemInput.value.trim();
 
             if (rawInput !== '') {
-                const items = rawInput.split(/[\s,\.\n]+/);
-                items.forEach(item => {
-                    const trimmedItem = item.trim();
-                    if (trimmedItem !== '') {
-                        addItemToList(trimmedItem);
-                    }
-                });
+                // מוסיפים את כל הקלט כמוצר אחד, ללא פיצול לפי רווחים
+                addItemToList(rawInput);
                 itemInput.value = '';
             }
         });
@@ -171,15 +165,15 @@
         });
 
         function addItemToList(itemText) {
-            // li element
+            // יצירת אלמנט li
             const listItem = document.createElement('li');
 
-            // span: מוצג כ"מוצר: ..."
+            // יצירת span שמציג את שם המוצר
             const productSpan = document.createElement('span');
             productSpan.classList.add('item-text');
             productSpan.textContent = `מוצר: ${itemText}`;
 
-            // כפתור "מחק"
+            // יצירת כפתור "מחק"
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'מחק';
             deleteButton.classList.add('delete-button');
@@ -187,7 +181,7 @@
                 listItem.remove();
             });
 
-            // כפתור "סמן שנקנה"
+            // יצירת כפתור "סמן שנקנה"
             const boughtButton = document.createElement('button');
             boughtButton.textContent = 'סמן שנקנה';
             boughtButton.classList.add('bought-button');
@@ -195,12 +189,12 @@
                 productSpan.classList.toggle('bought');
             });
 
-            // הוספת הכל ל-li
+            // הוספת האלמנטים ל-li
             listItem.appendChild(productSpan);
             listItem.appendChild(boughtButton);
             listItem.appendChild(deleteButton);
 
-            // הוספה ל-ul
+            // הוספת ה-li לרשימה
             document.getElementById('shopping-list').appendChild(listItem);
         }
 
@@ -226,7 +220,7 @@
                 addItemToList(item.text);
             });
 
-            // לאחר שנטענו הפריטים, סימון אלה שקנו
+            // סימון פריטים שנקנו
             const items = document.querySelectorAll('#shopping-list li');
             items.forEach(li => {
                 const productText = li.querySelector('.item-text');
