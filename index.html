@@ -6,14 +6,16 @@
     <title>רשימת קניות</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* איפוס בסיסי */
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            /* הסרת ה-flex וה-100vh כדי לאפשר גלילה טבעית של העמוד */
         }
 
         .container {
@@ -23,6 +25,7 @@
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             width: 90%;
             max-width: 400px;
+            margin: 30px auto; /* מרכז את הקונטיינר + רווח מלמעלה */
         }
 
         h2 {
@@ -61,6 +64,9 @@
         ul {
             list-style-type: none;
             padding: 0;
+            max-height: 300px; /* אם רוצים גלילה פנימית לאזור הרשימה */
+            overflow-y: auto;  /* גלילה פנימית לפריטים */
+            margin: 0;
         }
 
         li {
@@ -142,18 +148,23 @@
     </div>
 
     <script>
-        document.getElementById('add-button').addEventListener('click', function() {
-            const itemInput = document.getElementById('item-input');
-            const rawInput = itemInput.value.trim();
+        const itemInput = document.getElementById('item-input');
+        const shoppingList = document.getElementById('shopping-list');
+        const addButton = document.getElementById('add-button');
+        const shareButton = document.getElementById('share-button');
 
-            if (rawInput !== '') {
-                // מוסיפים את כל הקלט כמוצר אחד, ללא פיצול לפי רווחים
+        // מאזין לכפתור "הוסף"
+        addButton.addEventListener('click', () => {
+            const rawInput = itemInput.value.trim();
+            if (rawInput) {
                 addItemToList(rawInput);
                 itemInput.value = '';
+                saveListToLocalStorage();
             }
         });
 
-        document.getElementById('share-button').addEventListener('click', function() {
+        // שתף בווטסאפ
+        shareButton.addEventListener('click', () => {
             const items = document.querySelectorAll('#shopping-list li');
             let itemList = 'רשימת קניות:\n';
             items.forEach(item => {
@@ -164,73 +175,81 @@
             window.open(whatsappUrl, '_blank');
         });
 
-        function addItemToList(itemText) {
-            // יצירת אלמנט li
+        // פונקציית הוספת פריט לרשימה
+        function addItemToList(text) {
             const listItem = document.createElement('li');
 
-            // יצירת span שמציג את שם המוצר
             const productSpan = document.createElement('span');
             productSpan.classList.add('item-text');
-            productSpan.textContent = `מוצר: ${itemText}`;
+            productSpan.textContent = `מוצר: ${text}`;
 
-            // יצירת כפתור "מחק"
+            // כפתור מחיקה
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'מחק';
             deleteButton.classList.add('delete-button');
-            deleteButton.addEventListener('click', function() {
+            deleteButton.addEventListener('click', () => {
                 listItem.remove();
+                saveListToLocalStorage();
             });
 
-            // יצירת כפתור "סמן שנקנה"
+            // כפתור סמן שנקנה
             const boughtButton = document.createElement('button');
             boughtButton.textContent = 'סמן שנקנה';
             boughtButton.classList.add('bought-button');
-            boughtButton.addEventListener('click', function() {
+            boughtButton.addEventListener('click', () => {
                 productSpan.classList.toggle('bought');
+                saveListToLocalStorage();
             });
 
-            // הוספת האלמנטים ל-li
             listItem.appendChild(productSpan);
             listItem.appendChild(boughtButton);
             listItem.appendChild(deleteButton);
 
-            // הוספת ה-li לרשימה
-            document.getElementById('shopping-list').appendChild(listItem);
+            shoppingList.appendChild(listItem);
         }
 
-        // שמירת הנתונים ב-Local Storage
-        window.addEventListener('beforeunload', function() {
+        // פונקציה לשמירת הרשימה ב-LocalStorage
+        function saveListToLocalStorage() {
             const items = document.querySelectorAll('#shopping-list li');
             let itemList = [];
-
             items.forEach(item => {
-                const productText = item.querySelector('.item-text');
-                itemList.push({
-                    text: productText ? productText.textContent.replace('מוצר: ', '') : '',
-                    bought: productText ? productText.classList.contains('bought') : false
-                });
+                const productTextElement = item.querySelector('.item-text');
+                const productText = productTextElement
+                    ? productTextElement.textContent.replace('מוצר: ', '')
+                    : '';
+                const bought = productTextElement
+                    ? productTextElement.classList.contains('bought')
+                    : false;
+                
+                itemList.push({ text: productText, bought: bought });
             });
             localStorage.setItem('shoppingList', JSON.stringify(itemList));
-        });
+        }
 
-        // טעינת הנתונים מ-Local Storage
-        window.addEventListener('load', function() {
+        // טעינת הרשימה מ-LocalStorage
+        function loadListFromLocalStorage() {
             const savedItems = JSON.parse(localStorage.getItem('shoppingList')) || [];
             savedItems.forEach(item => {
                 addItemToList(item.text);
             });
 
-            // סימון פריטים שנקנו
+            // לאחר יצירת כל ה-li, מעדכנים מי "נקנה"
             const items = document.querySelectorAll('#shopping-list li');
             items.forEach(li => {
-                const productText = li.querySelector('.item-text');
-                const originalText = productText.textContent.replace('מוצר: ', '');
+                const productSpan = li.querySelector('.item-text');
+                if (!productSpan) return;
+                // טקסט מקורי בלי "מוצר: "
+                const originalText = productSpan.textContent.replace('מוצר: ', '');
+                // מחפשים את הפריט השמור
                 const savedItem = savedItems.find(i => i.text === originalText);
                 if (savedItem && savedItem.bought) {
-                    productText.classList.add('bought');
+                    productSpan.classList.add('bought');
                 }
             });
-        });
+        }
+
+        // בעת הטעינה, טוענים את הרשימה
+        window.addEventListener('load', loadListFromLocalStorage);
     </script>
 </body>
 </html>
