@@ -5,134 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>רשימת קניות</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- גרירה -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
-        /* איפוס בסיסי */
-        html, body {
-            margin: 0;
-            padding: 0;
-        }
-
+        html, body { margin: 0; padding: 0; }
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f5f5f5;
-            /* הסרת ה-flex וה-100vh כדי לאפשר גלילה טבעית של העמוד */
         }
-
         .container {
-            background-color: #ffffff;
+            background-color: #fff;
             padding: 20px;
             border-radius: 15px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
             width: 90%;
             max-width: 400px;
-            margin: 30px auto; /* מרכז את הקונטיינר + רווח מלמעלה */
+            margin: 30px auto;
         }
-
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-
-        .input-container {
-            display: flex;
-            margin-bottom: 15px;
-        }
-
+        h2 { text-align: center; color: #333; }
+        .input-container { display: flex; margin-bottom: 15px; }
         #item-input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            outline: none;
+            flex: 1; padding: 10px; border: 1px solid #ddd;
+            border-radius: 8px; outline: none;
         }
-
         #add-button {
-            padding: 10px;
-            margin-left: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+            padding: 10px; margin-left: 10px;
+            background-color: #4CAF50; color: white; border: none;
+            border-radius: 8px; cursor: pointer;
             transition: background-color 0.3s;
         }
-
-        #add-button:hover {
-            background-color: #45a049;
-        }
-
+        #add-button:hover { background-color: #45a049; }
         ul {
-            list-style-type: none;
-            padding: 0;
-            max-height: 300px; /* אם רוצים גלילה פנימית לאזור הרשימה */
-            overflow-y: auto;  /* גלילה פנימית לפריטים */
-            margin: 0;
+            list-style-type: none; padding: 0; max-height: 300px;
+            overflow-y: auto; margin: 0;
         }
-
         li {
-            display: flex;
-            flex-direction: row-reverse;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #f9f9f9;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 8px;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex; flex-direction: row-reverse; justify-content: space-between;
+            align-items: center; background-color: #f9f9f9; padding: 10px;
+            margin: 5px 0; border-radius: 8px; box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+            cursor: grab;
         }
-
-        .item-text {
-            font-weight: bold;
-        }
-
+        .item-text { font-weight: bold; cursor: pointer; }
         .delete-button {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 8px;
-            cursor: pointer;
+            background-color: #f44336; color: white; border: none;
+            padding: 5px 10px; border-radius: 8px; cursor: pointer;
             transition: background-color 0.3s;
         }
-
-        .delete-button:hover {
-            background-color: #e53935;
-        }
-
+        .delete-button:hover { background-color: #e53935; }
         .bought-button {
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-left: 10px;
+            background-color: #2196F3; color: white; border: none;
+            padding: 5px 10px; border-radius: 8px; cursor: pointer;
+            margin-left: 10px; transition: background-color 0.3s;
+        }
+        .bought-button:hover { background-color: #1976D2; }
+        .bought { text-decoration: line-through; color: #888; }
+        #share-button, #clear-list {
+            padding: 10px; border: none; border-radius: 8px;
+            cursor: pointer; width: 100%; margin-top: 10px;
             transition: background-color 0.3s;
         }
-
-        .bought-button:hover {
-            background-color: #1976D2;
-        }
-
-        .bought {
-            text-decoration: line-through;
-            color: #888;
-        }
-
         #share-button {
-            padding: 10px;
-            background-color: #25D366;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 15px;
-            transition: background-color 0.3s;
+            background-color: #25D366; color: white;
         }
-
-        #share-button:hover {
-            background-color: #20b954;
+        #share-button:hover { background-color: #20b954; }
+        #clear-list {
+            background-color: #e57373; color: white;
+        }
+        #clear-list:hover { background-color: #d32f2f; }
+        #counters {
+            text-align: center; margin-top: 10px; color: #555; font-weight: bold;
         }
     </style>
 </head>
@@ -144,7 +85,9 @@
             <button id="add-button">הוסף</button>
         </div>
         <ul id="shopping-list"></ul>
+        <div id="counters"></div>
         <button id="share-button">שתף בווטסאפ</button>
+        <button id="clear-list">נקה הכל</button>
     </div>
 
     <script>
@@ -152,8 +95,93 @@
         const shoppingList = document.getElementById('shopping-list');
         const addButton = document.getElementById('add-button');
         const shareButton = document.getElementById('share-button');
+        const clearListButton = document.getElementById('clear-list');
+        const counters = document.getElementById('counters');
 
-        // מאזין לכפתור "הוסף"
+        // --- צלילים (באדיבות pixabay) ---
+        const addSoundUrl = 'https://cdn.pixabay.com/audio/2022/10/16/audio_12b68b40f5.mp3';
+        const deleteSoundUrl = 'https://cdn.pixabay.com/audio/2022/03/15/audio_115b19669e.mp3';
+
+        function playSound(url) {
+            try {
+                new Audio(url).play();
+            } catch (e) {}
+        }
+
+        // --- הוספה בלחיצה על Enter ---
+        itemInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addButton.click();
+        });
+
+        // --- הוספת פריט ---
+        function addItemToList(text, isBought = false) {
+            if (!text) return;
+            // בדיקה אם קיים פריט כזה
+            const existing = Array.from(document.querySelectorAll('.item-text')).some(
+                span => span.textContent.replace('מוצר: ', '') === text
+            );
+            if (existing) {
+                alert('הפריט כבר קיים ברשימה!');
+                return;
+            }
+
+            const listItem = document.createElement('li');
+
+            const productSpan = document.createElement('span');
+            productSpan.classList.add('item-text');
+            productSpan.textContent = `מוצר: ${text}`;
+            if (isBought) productSpan.classList.add('bought');
+
+            // --- עריכת שם בלחיצה כפולה ---
+            productSpan.title = 'לחץ פעמיים לעריכה';
+            productSpan.addEventListener('dblclick', () => {
+                const newValue = prompt('ערוך את שם המוצר:', productSpan.textContent.replace('מוצר: ', ''));
+                if (newValue && newValue.trim()) {
+                    // בדיקת כפילות
+                    const duplicate = Array.from(document.querySelectorAll('.item-text')).some(
+                        span => span !== productSpan && span.textContent.replace('מוצר: ', '') === newValue.trim()
+                    );
+                    if (duplicate) {
+                        alert('שם זה כבר קיים ברשימה!');
+                        return;
+                    }
+                    productSpan.textContent = 'מוצר: ' + newValue.trim();
+                    saveListToLocalStorage();
+                    updateCounters();
+                }
+            });
+
+            // --- כפתור מחיקה ---
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'מחק';
+            deleteButton.classList.add('delete-button');
+            deleteButton.addEventListener('click', () => {
+                listItem.remove();
+                playSound(deleteSoundUrl);
+                saveListToLocalStorage();
+                updateCounters();
+            });
+
+            // --- כפתור נקנה ---
+            const boughtButton = document.createElement('button');
+            boughtButton.textContent = 'סמן שנקנה';
+            boughtButton.classList.add('bought-button');
+            boughtButton.addEventListener('click', () => {
+                productSpan.classList.toggle('bought');
+                saveListToLocalStorage();
+                updateCounters();
+            });
+
+            listItem.appendChild(productSpan);
+            listItem.appendChild(boughtButton);
+            listItem.appendChild(deleteButton);
+
+            shoppingList.appendChild(listItem);
+            playSound(addSoundUrl);
+            updateCounters();
+        }
+
+        // --- מניעת כפילויות וריקים בלחיצה על "הוסף" ---
         addButton.addEventListener('click', () => {
             const rawInput = itemInput.value.trim();
             if (rawInput) {
@@ -163,56 +191,38 @@
             }
         });
 
-        // שתף בווטסאפ
+        // --- שתף בווטסאפ ---
         shareButton.addEventListener('click', () => {
             const items = document.querySelectorAll('#shopping-list li');
             let itemList = 'רשימת קניות:\n';
             items.forEach(item => {
-                const productText = item.querySelector('.item-text').textContent || '';
+                const productText = item.querySelector('.item-text').textContent.replace('מוצר: ', '') || '';
                 itemList += '- ' + productText + '\n';
             });
             const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(itemList)}`;
             window.open(whatsappUrl, '_blank');
         });
 
-        // פונקציית הוספת פריט לרשימה
-        function addItemToList(text) {
-            const listItem = document.createElement('li');
-
-            const productSpan = document.createElement('span');
-            productSpan.classList.add('item-text');
-            productSpan.textContent = `מוצר: ${text}`;
-
-            // כפתור מחיקה
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'מחק';
-            deleteButton.classList.add('delete-button');
-            deleteButton.addEventListener('click', () => {
-                listItem.remove();
+        // --- נקה הכל ---
+        clearListButton.addEventListener('click', () => {
+            if (confirm('אתה בטוח שברצונך למחוק את כל הרשימה?')) {
+                shoppingList.innerHTML = '';
+                playSound(deleteSoundUrl);
                 saveListToLocalStorage();
-            });
+                updateCounters();
+            }
+        });
 
-            // כפתור סמן שנקנה
-            const boughtButton = document.createElement('button');
-            boughtButton.textContent = 'סמן שנקנה';
-            boughtButton.classList.add('bought-button');
-            boughtButton.addEventListener('click', () => {
-                productSpan.classList.toggle('bought');
-                saveListToLocalStorage();
-            });
-
-            listItem.appendChild(productSpan);
-            listItem.appendChild(boughtButton);
-            listItem.appendChild(deleteButton);
-
-            shoppingList.appendChild(listItem);
+        // --- עדכון מונה פריטים ---
+        function updateCounters() {
+            const all = document.querySelectorAll('#shopping-list li').length;
+            const bought = document.querySelectorAll('.item-text.bought').length;
+            counters.textContent = `סה"כ פריטים: ${all} | נקנו: ${bought}`;
         }
 
-        // פונקציה לשמירת הרשימה ב-LocalStorage
+        // --- שמירה ב-LocalStorage כולל מצב "נקנה" ומיקום ---
         function saveListToLocalStorage() {
-            const items = document.querySelectorAll('#shopping-list li');
-            let itemList = [];
-            items.forEach(item => {
+            const items = Array.from(document.querySelectorAll('#shopping-list li')).map(item => {
                 const productTextElement = item.querySelector('.item-text');
                 const productText = productTextElement
                     ? productTextElement.textContent.replace('מוצר: ', '')
@@ -220,36 +230,34 @@
                 const bought = productTextElement
                     ? productTextElement.classList.contains('bought')
                     : false;
-                
-                itemList.push({ text: productText, bought: bought });
+                return { text: productText, bought: bought };
             });
-            localStorage.setItem('shoppingList', JSON.stringify(itemList));
+            localStorage.setItem('shoppingList', JSON.stringify(items));
         }
 
-        // טעינת הרשימה מ-LocalStorage
+        // --- טעינה מה-LocalStorage ---
         function loadListFromLocalStorage() {
             const savedItems = JSON.parse(localStorage.getItem('shoppingList')) || [];
+            shoppingList.innerHTML = '';
             savedItems.forEach(item => {
-                addItemToList(item.text);
-            });
-
-            // לאחר יצירת כל ה-li, מעדכנים מי "נקנה"
-            const items = document.querySelectorAll('#shopping-list li');
-            items.forEach(li => {
-                const productSpan = li.querySelector('.item-text');
-                if (!productSpan) return;
-                // טקסט מקורי בלי "מוצר: "
-                const originalText = productSpan.textContent.replace('מוצר: ', '');
-                // מחפשים את הפריט השמור
-                const savedItem = savedItems.find(i => i.text === originalText);
-                if (savedItem && savedItem.bought) {
-                    productSpan.classList.add('bought');
-                }
+                addItemToList(item.text, item.bought);
             });
         }
 
-        // בעת הטעינה, טוענים את הרשימה
-        window.addEventListener('load', loadListFromLocalStorage);
+        // --- גרירה Drag & Drop (Sortable) ---
+        new Sortable(shoppingList, {
+            animation: 150,
+            onEnd: () => {
+                saveListToLocalStorage();
+                updateCounters();
+            }
+        });
+
+        // --- טען בהתחלה ---
+        window.addEventListener('load', () => {
+            loadListFromLocalStorage();
+            updateCounters();
+        });
     </script>
 </body>
 </html>
