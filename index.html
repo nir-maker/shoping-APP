@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>רשימת קניות</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <!-- גרירה -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         html, body { margin: 0; padding: 0; }
         body {
@@ -37,17 +34,15 @@
         #add-button:hover { background-color: #45a049; }
         ul {
             list-style-type: none; padding: 0;
-            height: 300px;  /* גובה קבוע לגלילה */
+            height: 300px;
             overflow-y: auto; margin: 0;
         }
-        /* עיצוב פס גלילה */
         ul::-webkit-scrollbar { width: 10px; }
         ul::-webkit-scrollbar-thumb {
             background: #ccc;
             border-radius: 5px;
         }
         ul::-webkit-scrollbar-track { background: #f5f5f5; }
-
         li {
             display: flex; flex-direction: row-reverse; justify-content: space-between;
             align-items: center; background-color: #f9f9f9; padding: 10px;
@@ -85,6 +80,7 @@
             text-align: center; margin-top: 10px; color: #555; font-weight: bold;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -98,7 +94,6 @@
         <button id="share-button">שתף בווטסאפ</button>
         <button id="clear-list">נקה הכל</button>
     </div>
-
     <script>
         const itemInput = document.getElementById('item-input');
         const shoppingList = document.getElementById('shopping-list');
@@ -107,25 +102,14 @@
         const clearListButton = document.getElementById('clear-list');
         const counters = document.getElementById('counters');
 
-        // --- צלילים (באדיבות pixabay) ---
-        const addSoundUrl = 'https://cdn.pixabay.com/audio/2022/10/16/audio_12b68b40f5.mp3';
-        const deleteSoundUrl = 'https://cdn.pixabay.com/audio/2022/03/15/audio_115b19669e.mp3';
-
-        function playSound(url) {
-            try {
-                new Audio(url).play();
-            } catch (e) {}
-        }
-
-        // --- הוספה בלחיצה על Enter ---
+        // הוספה בלחיצה על Enter
         itemInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') addButton.click();
         });
 
-        // --- הוספת פריט ---
+        // הוספת פריט
         function addItemToList(text, isBought = false, skipSave = false) {
             if (!text) return;
-            // בדיקה אם קיים פריט כזה
             const existing = Array.from(document.querySelectorAll('.item-text')).some(
                 span => span.textContent.replace('מוצר: ', '') === text
             );
@@ -133,20 +117,17 @@
                 if (!skipSave) alert('הפריט כבר קיים ברשימה!');
                 return;
             }
-
             const listItem = document.createElement('li');
 
             const productSpan = document.createElement('span');
             productSpan.classList.add('item-text');
             productSpan.textContent = `מוצר: ${text}`;
             if (isBought) productSpan.classList.add('bought');
-
-            // --- עריכת שם בלחיצה כפולה ---
             productSpan.title = 'לחץ פעמיים לעריכה';
+
             productSpan.addEventListener('dblclick', () => {
                 const newValue = prompt('ערוך את שם המוצר:', productSpan.textContent.replace('מוצר: ', ''));
                 if (newValue && newValue.trim()) {
-                    // בדיקת כפילות
                     const duplicate = Array.from(document.querySelectorAll('.item-text')).some(
                         span => span !== productSpan && span.textContent.replace('מוצר: ', '') === newValue.trim()
                     );
@@ -160,18 +141,17 @@
                 }
             });
 
-            // --- כפתור מחיקה ---
+            // מחיקה
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'מחק';
             deleteButton.classList.add('delete-button');
             deleteButton.addEventListener('click', () => {
                 listItem.remove();
-                playSound(deleteSoundUrl);
                 saveListToLocalStorage();
                 updateCounters();
             });
 
-            // --- כפתור נקנה ---
+            // סימון כנקנה
             const boughtButton = document.createElement('button');
             boughtButton.textContent = 'סמן שנקנה';
             boughtButton.classList.add('bought-button');
@@ -186,22 +166,19 @@
             listItem.appendChild(deleteButton);
 
             shoppingList.appendChild(listItem);
-            playSound(addSoundUrl);
             updateCounters();
             if (!skipSave) saveListToLocalStorage();
         }
 
-        // --- מניעת כפילויות וריקים בלחיצה על "הוסף" ---
         addButton.addEventListener('click', () => {
             const rawInput = itemInput.value.trim();
             if (rawInput) {
                 addItemToList(rawInput);
                 itemInput.value = '';
-                // saveListToLocalStorage(); <-- כבר מתבצע בתוך addItemToList
             }
         });
 
-        // --- שתף בווטסאפ ---
+        // שתף בווטסאפ
         shareButton.addEventListener('click', () => {
             const items = document.querySelectorAll('#shopping-list li');
             let itemList = 'רשימת קניות:\n';
@@ -213,24 +190,21 @@
             window.open(whatsappUrl, '_blank');
         });
 
-        // --- נקה הכל ---
+        // נקה הכל
         clearListButton.addEventListener('click', () => {
             if (confirm('אתה בטוח שברצונך למחוק את כל הרשימה?')) {
                 shoppingList.innerHTML = '';
-                playSound(deleteSoundUrl);
                 saveListToLocalStorage();
                 updateCounters();
             }
         });
 
-        // --- עדכון מונה פריטים ---
         function updateCounters() {
             const all = document.querySelectorAll('#shopping-list li').length;
             const bought = document.querySelectorAll('.item-text.bought').length;
             counters.textContent = `סה"כ פריטים: ${all} | נקנו: ${bought}`;
         }
 
-        // --- שמירה ב-LocalStorage כולל מצב "נקנה" ומיקום ---
         function saveListToLocalStorage() {
             const items = Array.from(document.querySelectorAll('#shopping-list li')).map(item => {
                 const productTextElement = item.querySelector('.item-text');
@@ -245,16 +219,15 @@
             localStorage.setItem('shoppingList', JSON.stringify(items));
         }
 
-        // --- טעינה מה-LocalStorage ---
         function loadListFromLocalStorage() {
             const savedItems = JSON.parse(localStorage.getItem('shoppingList')) || [];
             shoppingList.innerHTML = '';
             savedItems.forEach(item => {
-                addItemToList(item.text, item.bought, true); // לא מבצע save תוך כדי טעינה!
+                addItemToList(item.text, item.bought, true);
             });
         }
 
-        // --- גרירה Drag & Drop (Sortable) ---
+        // גרירה Drag & Drop (Sortable)
         let isDragging = false;
 
         new Sortable(shoppingList, {
@@ -278,7 +251,6 @@
             }
         });
 
-        // --- טען בהתחלה ---
         window.addEventListener('load', () => {
             loadListFromLocalStorage();
             updateCounters();
