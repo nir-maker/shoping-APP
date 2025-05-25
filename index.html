@@ -37,7 +37,7 @@
         #add-button:hover { background-color: #45a049; }
         ul {
             list-style-type: none; padding: 0;
-            height: 300px;  /* שונה מ-max-height ל-height */
+            height: 300px;  /* גובה קבוע לגלילה */
             overflow-y: auto; margin: 0;
         }
         /* עיצוב פס גלילה */
@@ -123,14 +123,14 @@
         });
 
         // --- הוספת פריט ---
-        function addItemToList(text, isBought = false) {
+        function addItemToList(text, isBought = false, skipSave = false) {
             if (!text) return;
             // בדיקה אם קיים פריט כזה
             const existing = Array.from(document.querySelectorAll('.item-text')).some(
                 span => span.textContent.replace('מוצר: ', '') === text
             );
             if (existing) {
-                alert('הפריט כבר קיים ברשימה!');
+                if (!skipSave) alert('הפריט כבר קיים ברשימה!');
                 return;
             }
 
@@ -188,6 +188,7 @@
             shoppingList.appendChild(listItem);
             playSound(addSoundUrl);
             updateCounters();
+            if (!skipSave) saveListToLocalStorage();
         }
 
         // --- מניעת כפילויות וריקים בלחיצה על "הוסף" ---
@@ -196,7 +197,7 @@
             if (rawInput) {
                 addItemToList(rawInput);
                 itemInput.value = '';
-                saveListToLocalStorage();
+                // saveListToLocalStorage(); <-- כבר מתבצע בתוך addItemToList
             }
         });
 
@@ -249,7 +250,7 @@
             const savedItems = JSON.parse(localStorage.getItem('shoppingList')) || [];
             shoppingList.innerHTML = '';
             savedItems.forEach(item => {
-                addItemToList(item.text, item.bought);
+                addItemToList(item.text, item.bought, true); // לא מבצע save תוך כדי טעינה!
             });
         }
 
