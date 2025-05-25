@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>רשימת קניות</title>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        .container { width: 400px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 15px; }
+        .container { width: 100%; max-width: 400px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 15px; }
         ul { height: 300px; overflow-y: auto; margin: 0; padding: 0; list-style-type: none; }
         li { display: flex; flex-direction: row-reverse; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 10px; margin: 5px 0; border-radius: 8px; }
         .bought { text-decoration: line-through; color: #888; }
@@ -20,7 +19,7 @@
     <div class="container">
         <h2>רשימת קניות</h2>
         <div>
-            <input type="text" id="item-input" placeholder="הוסף פריט..." />
+            <input type="text" id="item-input" placeholder="הוסף פריט..." autocomplete="off" />
             <button id="add-button">הוסף</button>
         </div>
         <ul id="shopping-list"></ul>
@@ -45,25 +44,26 @@
 
         function addItem(text, bought = false) {
             const li = document.createElement('li');
-
             const span = document.createElement('span');
             span.textContent = text;
             if (bought) span.classList.add('bought');
 
-            // כפתור סימון כנקנה
+            // סימון כנקנה (גם בטאץ'!)
             const boughtBtn = document.createElement('button');
             boughtBtn.textContent = 'סמן שנקנה';
             boughtBtn.className = 'bought-button';
-            boughtBtn.onclick = function() {
+            boughtBtn.onclick = function(e) {
+                e.stopPropagation();
                 span.classList.toggle('bought');
                 save();
             };
 
-            // כפתור מחיקה
+            // מחיקה (גם בטאץ'!)
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'מחק';
             deleteBtn.className = 'delete-button';
-            deleteBtn.onclick = function() {
+            deleteBtn.onclick = function(e) {
+                e.stopPropagation();
                 li.remove();
                 save();
             };
@@ -90,12 +90,6 @@
             shoppingList.innerHTML = '';
             items.forEach(item => addItem(item.text, item.bought));
         }
-
-        // הפעל גרירה
-        new Sortable(shoppingList, {
-            animation: 150,
-            onEnd: save
-        });
 
         window.onload = load;
     </script>
