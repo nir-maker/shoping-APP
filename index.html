@@ -26,15 +26,18 @@
         }
         .add-item {
             display: flex;
+            flex-direction: column;
             margin-bottom: 15px;
         }
-        .add-item input {
-            flex: 1;
+        .add-item textarea {
+            resize: vertical;
             padding: 8px;
             font-size: 1rem;
-            border-radius: 5px 0 0 5px;
+            border-radius: 5px;
             border: 1px solid #ccc;
             outline: none;
+            min-height: 60px;
+            margin-bottom: 8px;
         }
         .add-item button {
             padding: 8px 18px;
@@ -42,9 +45,10 @@
             background: #4caf50;
             color: white;
             font-weight: bold;
-            border-radius: 0 5px 5px 0;
+            border-radius: 5px;
             cursor: pointer;
             transition: background 0.2s;
+            align-self: flex-end;
         }
         .add-item button:hover {
             background: #388e3c;
@@ -85,8 +89,8 @@
     <div class="container">
         <h2>🛒 רשימת קניות</h2>
         <div class="add-item">
-            <input id="itemInput" type="text" placeholder="הוסף מוצר...">
-            <button onclick="addItem()">הוסף</button>
+            <textarea id="itemInput" placeholder="הדבק כאן רשימת מצרכים, כל מוצר בשורה נפרדת"></textarea>
+            <button onclick="addItems()">הוסף את כל הרשימה</button>
         </div>
         <ul id="shoppingList"></ul>
     </div>
@@ -96,18 +100,22 @@
         // טעינת רשימה מה-localStorage
         window.onload = function() {
             const saved = localStorage.getItem("shoppingList");
-            if(saved) {
+            if (saved) {
                 shoppingList = JSON.parse(saved);
                 renderList();
             }
         }
 
-        function addItem() {
-            const input = document.getElementById('itemInput');
-            const name = input.value.trim();
-            if (name === "") return;
-            shoppingList.push({name: name, bought: false});
-            input.value = "";
+        function addItems() {
+            const textarea = document.getElementById('itemInput');
+            // פיצול על שורות, סינון שורות ריקות
+            const lines = textarea.value
+                .split('\n')
+                .map(l => l.trim())
+                .filter(l => l !== "");
+            // הוספה למערך
+            lines.forEach(name => shoppingList.push({ name, bought: false }));
+            textarea.value = "";
             saveAndRender();
         }
 
