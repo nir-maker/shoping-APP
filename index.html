@@ -99,18 +99,19 @@
         <h2>🛒 רשימת קניות</h2>
         <div class="add-item">
             <textarea id="itemInput" placeholder="הדבק כאן רשימת מצרכים, כל מוצר בשורה נפרדת"></textarea>
-            <button onclick="addItems()">הוסף את כל הרשימה</button>
+            <!-- הסרנו onclick ונתנו id לכפתור -->
+            <button id="addBtn">הוסף את כל הרשימה</button>
         </div>
         <div id="categoriesContainer"></div>
     </div>
 
     <script>
-        // מיפוי קטגוריות->מילות מפתח
+        // מיפוי קטגוריות למילות מפתח
         const categoryMap = {
             "פירות":        ["תפוח","בננה","תפוז","אבטיח","ענבים","תות","קיווי","פרי"],
             "ירקות":       ["גזר","מלפפון","עגבנייה","פלפל","חסה","בצל","שומר","ברוקולי"],
             "מוצרי חלב":    ["חלב","גבינה","יוגורט","שמנת","קוטג'","חמאה"],
-            "לחמים ומאפים": ["לחם","בייגל","בורקס","קרואסון","מייפל","פיתות"],
+            "לחמים ומאפים": ["לחם","בייגל","בורקס","קרואסון","פיתות"],
             "משקאות":       ["מים","תה","קפה","מיץ","סודה","קולה","בירה"],
             "בשרים ודגים":  ["בשר","עוף","דג","סטייק","המבורגר"],
             "מתוקים":       ["שוקולד","עוגה","גלידה","ממתק","דבש"]
@@ -118,13 +119,17 @@
 
         let shoppingList = [];
 
-        window.onload = function() {
+        window.addEventListener('DOMContentLoaded', () => {
+            // הטענת רשימה משמירת LocalStorage (אם קיימת)
             const saved = localStorage.getItem("shoppingList");
             if (saved) {
                 shoppingList = JSON.parse(saved);
                 renderList();
             }
-        }
+            // קישור הכפתור לפונקציה
+            document.getElementById('addBtn')
+                .addEventListener('click', addItems);
+        });
 
         function addItems() {
             const lines = document.getElementById('itemInput').value
@@ -147,7 +152,6 @@
         }
 
         function categorizeItems() {
-            // אתחול המיכלים לכל קטגוריה + אחרים
             const categories = {};
             Object.keys(categoryMap).forEach(cat => categories[cat] = []);
             categories["אחרים"] = [];
