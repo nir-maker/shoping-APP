@@ -1,0 +1,24 @@
+{
+  "name": "רשימת קניות משודרגת",
+  "short_name": "רשימת קניות",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#2563eb",
+  "description": "אפליקציית רשימת קניות עם שמירה מקומית והתקנה למסך הבית.",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

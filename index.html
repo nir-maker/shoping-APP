@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="רשימת קניות" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>רשימת קניות משודרגת</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --card-2:#f8fafc;
+      --ink:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --accent:#2563eb;
+      --accent-2:#1d4ed8;
+      --ok:#16a34a;
+      --warn:#dc2626;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#f8fbff 0%, #f5f7fb 100%);
+      color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
+    }
+
+    button,input,select,textarea{font:inherit}
+
+    .wrap{max-width:1100px;margin:auto;padding:18px}
+
+    .hero{
+      display:grid;
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .hero-main{
+      background:linear-gradient(135deg,#ffffff 0%, #f8fbff 100%);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:20px;
+    }
+
+    .hero h1{margin:0 0 8px 0;font-size:1.8rem}
+    .hero p{margin:0;color:var(--muted);line-height:1.55}
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .stat{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      box-shadow:var(--shadow);
+    }
+
+    .stat .label{font-size:.9rem;color:var(--muted);margin-bottom:6px}
+    .stat .value{font-size:1.4rem;font-weight:700}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .section{padding:18px}
+    .section-title{font-size:1.05rem;font-weight:700;margin:0 0 12px 0}
+    .hint{color:var(--muted);font-size:.94rem;line-height:1.5}
+    .muted{color:var(--muted)}
+
+    .row{display:flex;gap:14px;flex-wrap:wrap}
+    .col{flex:1 1 320px;min-width:280px}
+
+    label{display:block;margin-bottom:6px}
+
+    textarea,input,select{
+      width:100%;
+      padding:12px 13px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      color:var(--ink);
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+
+    textarea{min-height:120px;resize:vertical}
+
+    textarea:focus,input:focus,select:focus{
+      outline:none;
+      border-color:rgba(37,99,235,.55);
+      box-shadow:0 0 0 4px rgba(37,99,235,.12);
+    }
+
+    button{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 14px;
+      background:#f3f4f6;
+      color:var(--ink);
+      cursor:pointer;
+      transition:transform .05s ease, background .2s ease, border-color .2s ease;
+    }
+
+    button:hover{background:#eef2f7}
+    button:active{transform:translateY(1px)}
+    button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    button.primary:hover{background:var(--accent-2);border-color:var(--accent-2)}
+    button.ghost{background:#fff}
+    button.danger{background:#fff;color:var(--warn);border-color:#fecaca}
+    button.danger:hover{background:#fef2f2}
+    button.soft-ok{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
+    button:disabled{opacity:.55;cursor:not-allowed}
+
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+
+    .inline-hint{position:relative}
+    .ghost-hint{
+      position:absolute;
+      inset-inline-start:14px;
+      inset-block-start:50%;
+      transform:translateY(-50%);
+      pointer-events:none;
+      color:#9ca3af;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-inline-size:calc(100% - 28px);
+      opacity:.85;
+    }
+
+    .controls{
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr auto auto auto;
+      gap:10px;
+      align-items:center;
+    }
+
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{background:#fff}
+    .tab.active{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+
+    .progress-wrap{
+      margin-top:14px;
+      background:#eef2f7;
+      border-radius:999px;
+      overflow:hidden;
+      height:12px;
+    }
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#22c55e,#16a34a);
+      transition:width .25s ease;
+    }
+
+    .groups{display:grid;gap:12px}
+
+    .group{
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    .group-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      padding:12px 14px;
+      background:var(--card-2);
+      border-bottom:1px solid var(--line);
+    }
+
+    .group-title{font-weight:700}
+    .group-count{
+      font-size:.83rem;
+      color:var(--muted);
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:2px 9px;
+    }
+
+    .list{list-style:none;margin:0;padding:0}
+
+    .item{
+      display:grid;
+      grid-template-columns:auto 1fr auto auto auto;
+      gap:10px;
+      align-items:center;
+      padding:12px 14px;
+      border-bottom:1px dashed var(--line);
+    }
+
+    .item:last-child{border-bottom:none}
+    .item.done .name{opacity:.62;text-decoration:line-through}
+
+    .check{
+      inline-size:1.15rem;
+      block-size:1.15rem;
+      cursor:pointer;
+    }
+
+    .name-wrap{display:grid;gap:4px;min-width:0}
+    .name{
+      font-weight:600;
+      line-height:1.3;
+      cursor:text;
+      word-break:break-word;
+    }
+    .meta{font-size:.84rem;color:var(--muted)}
+
+    .qty-box{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:4px;
+    }
+    .qty-btn{
+      min-width:32px;
+      min-height:32px;
+      border-radius:999px;
+      padding:0;
+    }
+    .qty-value{
+      min-width:36px;
+      text-align:center;
+      font-weight:700;
+      padding:0 6px;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .cat-select{
+      min-width:150px;
+      width:auto;
+      padding:8px 10px;
+      border-radius:999px;
+      background:#fff;
+    }
+
+    .item-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:26px;
+      min-height:26px;
+      padding:0 8px;
+      border-radius:999px;
+      background:#94a3b8;
+      color:#fff;
+      font-size:.76rem;
+    }
+
+    .empty{
+      padding:34px 18px;
+      text-align:center;
+      color:var(--muted);
+      border:1px dashed var(--line);
+      border-radius:16px;
+      background:#fff;
+    }
+
+    .footer-note{margin-top:10px;font-size:.9rem;color:var(--muted)}
+
+    .toast-stack{
+      position:fixed;
+      inset-block-end:16px;
+      inset-inline-start:16px;
+      display:grid;
+      gap:8px;
+      z-index:10000;
+    }
+    .toast{
+      background:#111827;
+      color:#fff;
+      padding:10px 12px;
+      border-radius:14px;
+      box-shadow:var(--shadow);
+      max-width:320px;
+      font-size:.92rem;
+    }
+
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.35);
+      display:grid;
+      place-items:center;
+      z-index:11000;
+      padding:16px;
+    }
+    .modal{
+      width:min(100%,460px);
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+    .modal h3{margin:0 0 8px 0}
+    .modal p{margin:0 0 14px 0;color:var(--muted);line-height:1.5}
+    .modal .toolbar{justify-content:flex-end}
+
+    .sr-only{
+      position:absolute;
+      inline-size:1px;
+      block-size:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+
+
+
+    .runtime-note{
+      margin-top:12px;
+      padding:12px 14px;
+      border:1px solid #fde68a;
+      background:#fffbeb;
+      color:#92400e;
+      border-radius:14px;
+      line-height:1.5;
+      font-size:.95rem;
+    }
+
+    #install-state{
+      display:inline-flex;
+      align-items:center;
+    }
+
+    button[hidden],
+    [hidden]{display:none !important}
+
+    @media (max-width:960px){
+      .controls{grid-template-columns:1fr 1fr 1fr auto auto auto}
+    }
+
+    @media (max-width:760px){
+      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .controls{grid-template-columns:1fr 1fr}
+      .item{grid-template-columns:auto 1fr;align-items:start}
+      .qty-box,.cat-select,.item-actions{grid-column:2}
+      .cat-select{width:100%}
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{scroll-behavior:auto;transition:none !important}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-main">
+        <h1>רשימת קניות</h1>
+        <p>גרסה משודרגת עם הוספה מהירה, זיהוי כמויות, השלמה אוטומטית, חיפוש, סינון, מיון, סטטיסטיקה, ניקוי פריטים שסומנו ובדיקות למפתחים.</p>
+        <div class="toolbar" style="margin-top:12px">
+          <button type="button" class="ghost" id="btn-install" hidden>התקן אפליקציה</button>
+          <span class="hint" id="install-state">השמירה תישמר טוב יותר כשפותחים את האפליקציה מכתובת קבועה ומוסיפים למסך הבית.</span>
+        </div>
+        <div class="runtime-note" id="runtime-note" hidden></div>
+        <div class="progress-wrap" aria-label="התקדמות">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="footer-note" id="progress-label">0% הושלמו</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="label">סה"כ פריטים</div><div class="value" id="stat-total">0</div></div>
+        <div class="stat"><div class="label">בוצעו</div><div class="value" id="stat-done">0</div></div>
+        <div class="stat"><div class="label">נותרו</div><div class="value" id="stat-open">0</div></div>
+        <div class="stat"><div class="label">קטגוריות פעילות</div><div class="value" id="stat-cats">0</div></div>
+      </div>
+    </section>
+
+    <section class="card section" aria-labelledby="add-title">
+      <h2 class="section-title" id="add-title">הוספת פריטים</h2>
+      <div class="row">
+        <div class="col">
+          <label class="hint" for="bulk">הדבקה מרובה או שורה בודדת</label>
+          <textarea id="bulk" placeholder="לדוגמה:
+ביצים
+2 קמח ללחם מנופה
+גבינה צהובה 9
+קוטג
+דג סלמון - 6 חתיכות"></textarea>
+          <div class="footer-note">אפשר להוסיף בכמה שורות או בפסיקים. קיצור מקלדת: Ctrl או Cmd + Enter.</div>
+        </div>
+
+        <div class="col">
+          <label class="hint" for="category">קטגוריה ברירת מחדל</label>
+          <select id="category"></select>
+          <div class="toolbar" style="margin-top:10px">
+            <button type="button" class="primary" id="btn-add">הוסף מרשימת ההדבקה</button>
+            <button type="button" class="ghost" id="btn-clear-input">נקה שדה</button>
+          </div>
+
+          <hr style="margin:16px 0;border:none;border-top:1px solid var(--line)">
+
+          <label class="hint" for="single">פריט בודד עם השלמה אוטומטית</label>
+          <div class="inline-hint">
+            <input id="single" list="suggestions" placeholder="הקלד למשל: מ → מלח" autocomplete="off" />
+            <div class="ghost-hint" id="ghost" aria-hidden="true"></div>
+          </div>
+          <datalist id="suggestions"></datalist>
+          <div class="toolbar" style="margin-top:10px">
+            <button type="button" class="primary" id="btn-add-one">הוסף פריט</button>
+          </div>
+          <div class="footer-note">טאב או חץ ימינה מקבלים השלמה. אנטר מוסיף לרשימה.</div>
+        </div>
+      </div>
+
+      <details style="margin-top:12px">
+        <summary>כללי זיהוי קלט</summary>
+        <div class="hint" style="margin-top:8px">
+          אם שורה מתחילה במספר נזהה אותו ככמות. אפשר גם לכתוב מספר בסוף, למשל "גבינה צהובה 9".
+          נתמכים גם דפוסים כמו "דג סלמון - 6 חתיכות".
+          ניתן לציין קטגוריה בסוף השורה בתוך סוגריים מרובעים, למשל: "עגבניות [ירקות ופירות]".
+        </div>
+      </details>
+    </section>
+
+    <section class="card section" aria-labelledby="list-title" style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+        <h2 class="section-title" id="list-title" style="margin:0">הרשימה שלי <span class="badge" id="count-badge">0</span></h2>
+        <div class="tabs" id="tabs"></div>
+      </div>
+
+      <div class="controls">
+        <div>
+          <label class="sr-only" for="search">חיפוש</label>
+          <input id="search" placeholder="חיפוש לפי שם או קטגוריה" />
+        </div>
+        <div>
+          <label class="sr-only" for="sort">מיון</label>
+          <select id="sort">
+            <option value="newest">מיון: חדשים קודם</option>
+            <option value="oldest">מיון: ישנים קודם</option>
+            <option value="name">מיון: לפי שם</option>
+            <option value="qty-desc">מיון: כמות גבוהה קודם</option>
+            <option value="qty-asc">מיון: כמות נמוכה קודם</option>
+          </select>
+        </div>
+        <div>
+          <label class="sr-only" for="group-mode">תצוגה</label>
+          <select id="group-mode">
+            <option value="category">תצוגה: לפי קטגוריה</option>
+            <option value="flat">תצוגה: רשימה אחת</option>
+          </select>
+        </div>
+        <button type="button" id="btn-export" class="ghost">ייצוא/שיתוף</button>
+        <button type="button" id="btn-clear-done" class="soft-ok">מחק בוצעו</button>
+        <button type="button" id="btn-reset" class="danger" title="איפוס מלא">איפוס מלא</button>
+      </div>
+
+      <div id="list-root" class="groups" aria-live="polite" style="margin-top:14px"></div>
+      <div class="empty" id="empty">אין פריטים ברשימה כרגע.</div>
+    </section>
+
+    <section class="card section" id="tests-card" style="margin-top:14px">
+      <details>
+        <summary>בדיקות אוטומטיות (למפתחים)</summary>
+        <div class="hint" style="margin:8px 0">הבדיקות לא משנות נתונים קיימים. אפשר להריץ גם עם <code>?test=1</code>.</div>
+        <div id="test-out" class="hint" style="margin:10px 0"></div>
+        <button type="button" id="btn-run-tests" class="ghost">הרץ בדיקות</button>
+      </details>
+    </section>
+  </main>
+
+  <div class="toast-stack" id="toast-stack"></div>
+
+  <script>
+    (function(){
+      'use strict';
+
+      const STORAGE_KEY = 'shopping_list_pro_v1';
+      const LEGACY_KEYS = ['shopping_list_v3','shopping_list_v2'];
+      const SUG_KEY = 'shopping_suggestions_pro_v1';
+      const SETTINGS_KEY = 'shopping_settings_v1';
+
+      const CATEGORIES = ['', 'ירקות ופירות','מוצרי חלב','בשר ודגים','מאפים וקמח','שימורים ותבלינים','נקיון וטואלטיקה','קפואים','שתיה','אחר'];
+      const FILTERS = [
+        { value:'all', label:'הכל' },
+        { value:'open', label:'פתוחים' },
+        { value:'done', label:'בוצעו' }
+      ];
+
+      const COMMON_ITEMS = [
+        'מלח','סוכר','קמח','אורז','פתיתים','פסטה','לחם','חלה','פיתות','קטשופ','חרדל','מיונז','סויה',
+        'ביצים','חלב','גבינה לבנה','גבינת קוטג','גבינה צהובה','יוגורט','שמנת','חמאה','מרגרינה',
+        'עגבניות','מלפפונים','פלפלים','תפוחי אדמה','בצל','שום','גזר','חסה','קישוא','חצילים',
+        'תפוחים','בננות','ענבים','אבוקדו','לימון','תותים','אגסים',
+        'עוף','חזה עוף','בשר טחון','קבבים','שניצל','דג סלמון','טונה',
+        'שמן זית','שמן קנולה','תבלינים','פפריקה','כמון','כורכום','פלפל שחור',
+        'נייר טואלט','סבון כלים','אבקת כביסה','מרכך כביסה','שקיות אשפה','מגבונים'
+      ];
+
+      const dom = {
+        bulk: document.getElementById('bulk'),
+        category: document.getElementById('category'),
+        single: document.getElementById('single'),
+        ghost: document.getElementById('ghost'),
+        datalist: document.getElementById('suggestions'),
+        btnAdd: document.getElementById('btn-add'),
+        btnAddOne: document.getElementById('btn-add-one'),
+        btnClearInput: document.getElementById('btn-clear-input'),
+        btnExport: document.getElementById('btn-export'),
+        btnReset: document.getElementById('btn-reset'),
+        btnClearDone: document.getElementById('btn-clear-done'),
+        search: document.getElementById('search'),
+        sort: document.getElementById('sort'),
+        groupMode: document.getElementById('group-mode'),
+        tabs: document.getElementById('tabs'),
+        root: document.getElementById('list-root'),
+        empty: document.getElementById('empty'),
+        badge: document.getElementById('count-badge'),
+        statTotal: document.getElementById('stat-total'),
+        statDone: document.getElementById('stat-done'),
+        statOpen: document.getElementById('stat-open'),
+        statCats: document.getElementById('stat-cats'),
+        progressBar: document.getElementById('progress-bar'),
+        progressLabel: document.getElementById('progress-label'),
+        toastStack: document.getElementById('toast-stack'),
+        testOut: document.getElementById('test-out'),
+        btnRunTests: document.getElementById('btn-run-tests'),
+        btnInstall: document.getElementById('btn-install'),
+        installState: document.getElementById('install-state'),
+        runtimeNote: document.getElementById('runtime-note')
+      };
+
+      let suggestionsCache = null;
+      let confirmFn = confirmDialog;
+      let promptFn = promptDialog;
+      let deferredInstallPrompt = null;
+
+      let state = loadState();
+      let ui = loadSettings();
+
+      init();
+
+      function init(){
+        fillCategorySelects();
+        renderTabs();
+        refreshDatalist();
+        applySettingsToUi();
+        bindEvents();
+        bindInstallPrompt();
+        registerPwa();
+        detectRuntimeAndStorage();
+        render();
+
+        if (new URLSearchParams(location.search).get('test') === '1'){
+          const res = runTests();
+          renderTestResults(res);
+          const det = document.querySelector('#tests-card details');
+          if(det) det.setAttribute('open','open');
+        }
+      }
+
+      function safeJsonParse(raw, fallback){
+        try{ return JSON.parse(raw); }catch(_){ return fallback; }
+      }
+
+      function uid(){
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+        return Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,6);
+      }
+
+      function clampQty(n){
+        if (!Number.isFinite(n)) return 1;
+        return Math.max(1, Math.round(n * 100) / 100);
+      }
+
+      function now(){ return Date.now(); }
+
+      function normalizeItem(it){
+        return {
+          id: String(it.id || uid()),
+          name: String(it.name || '').trim(),
+          qty: clampQty(Number(it.qty || 1)),
+          cat: String(it.cat || ''),
+          done: Boolean(it.done),
+          createdAt: Number(it.createdAt || now()),
+          updatedAt: Number(it.updatedAt || it.createdAt || now())
+        };
+      }
+
+      function normalizeList(list){
+        return (Array.isArray(list) ? list : []).map(normalizeItem).filter(it => it.name);
+      }
+
+      function loadState(){
+        const current = safeJsonParse(localStorage.getItem(STORAGE_KEY), null);
+        if (Array.isArray(current)) return normalizeList(current);
+
+        for (const key of LEGACY_KEYS){
+          const legacy = safeJsonParse(localStorage.getItem(key), null);
+          if (Array.isArray(legacy)){
+            const migrated = normalizeList(legacy);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+            return migrated;
+          }
+        }
+
+        return [];
+      }
+
+      function saveState(){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function loadSettings(){
+        const defaults = { filter:'all', sort:'newest', groupMode:'category', search:'' };
+        return { ...defaults, ...(safeJsonParse(localStorage.getItem(SETTINGS_KEY), {}) || {}) };
+      }
+
+      function saveSettings(){
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(ui));
+      }
+
+      function fillCategorySelects(){
+        const html = CATEGORIES.map(cat => `<option value="${escapeAttr(cat)}">${escapeHtml(cat || 'ללא')}</option>`).join('');
+        dom.category.innerHTML = html;
+      }
+
+      function renderTabs(){
+        dom.tabs.innerHTML = '';
+        for (const filter of FILTERS){
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'tab' + (ui.filter === filter.value ? ' active' : '');
+          btn.textContent = filter.label;
+          btn.addEventListener('click', ()=>{
+            ui.filter = filter.value;
+            saveSettings();
+            renderTabs();
+            render();
+          });
+          dom.tabs.appendChild(btn);
+        }
+      }
+
+      function applySettingsToUi(){
+        dom.search.value = ui.search || '';
+        dom.sort.value = ui.sort || 'newest';
+        dom.groupMode.value = ui.groupMode || 'category';
+      }
+
+      function bindEvents(){
+        dom.btnAdd.addEventListener('click', ()=>{
+          const text = dom.bulk.value.trim();
+          if (!text) return;
+          addBulk(text, dom.category.value);
+          dom.bulk.value = '';
+          dom.bulk.focus();
+        });
+
+        dom.btnClearInput.addEventListener('click', ()=>{
+          dom.bulk.value = '';
+          dom.bulk.focus();
+        });
+
+        dom.bulk.addEventListener('keydown', (e)=>{
+          if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+            e.preventDefault();
+            dom.btnAdd.click();
+          }
+        });
+
+        dom.single.addEventListener('input', ()=>showGhost(dom.single.value));
+        dom.single.addEventListener('keydown', (e)=>{
+          if ((e.key === 'Tab' || e.key === 'ArrowRight') && dom.ghost.textContent){
+            e.preventDefault();
+            acceptInlineCompletion();
+            return;
+          }
+          if (e.key === 'Enter'){
+            e.preventDefault();
+            addSingle();
+          }
+        });
+
+        dom.btnAddOne.addEventListener('click', addSingle);
+
+        dom.search.addEventListener('input', debounce(()=>{
+          ui.search = dom.search.value;
+          saveSettings();
+          render();
+        }, 80));
+
+        dom.sort.addEventListener('change', ()=>{
+          ui.sort = dom.sort.value;
+          saveSettings();
+          render();
+        });
+
+        dom.groupMode.addEventListener('change', ()=>{
+          ui.groupMode = dom.groupMode.value;
+          saveSettings();
+          render();
+        });
+
+        dom.btnExport.addEventListener('click', exportData);
+        dom.btnReset.addEventListener('click', clearAll);
+        dom.btnClearDone.addEventListener('click', clearDoneItems);
+        dom.btnRunTests && dom.btnRunTests.addEventListener('click', ()=>renderTestResults(runTests()));
+        dom.btnInstall && dom.btnInstall.addEventListener('click', installApp);
+
+        window.addEventListener('pagehide', ()=>{
+          try { saveState(); saveSettings(); } catch(_) {}
+        });
+
+        document.addEventListener('visibilitychange', ()=>{
+          if (document.hidden){
+            try { saveState(); saveSettings(); } catch(_) {}
+          }
+        });
+      }
+
+
+
+      function isStableAppOrigin(){
+        return location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      }
+
+      function bindInstallPrompt(){
+        window.addEventListener('beforeinstallprompt', (event)=>{
+          event.preventDefault();
+          deferredInstallPrompt = event;
+          if (dom.btnInstall) dom.btnInstall.hidden = false;
+          if (dom.installState) dom.installState.textContent = 'אפשר להתקין למסך הבית כדי לפתוח את הרשימה שוב כמו אפליקציה רגילה.';
+        });
+
+        window.addEventListener('appinstalled', ()=>{
+          deferredInstallPrompt = null;
+          if (dom.btnInstall) dom.btnInstall.hidden = true;
+          if (dom.installState) dom.installState.textContent = 'האפליקציה הותקנה למסך הבית.';
+          toast('האפליקציה הותקנה למסך הבית.');
+        });
+      }
+
+      function registerPwa(){
+        if (!('serviceWorker' in navigator)) return;
+        if (!isStableAppOrigin()) return;
+        window.addEventListener('load', ()=>{
+          navigator.serviceWorker.register('./sw.js').catch(()=>{});
+        }, { once:true });
+      }
+
+      async function detectRuntimeAndStorage(){
+        if (dom.runtimeNote){
+          if (!isStableAppOrigin()){
+            dom.runtimeNote.hidden = false;
+            dom.runtimeNote.textContent = 'הקובץ פתוח כרגע כתצוגה מקומית או זמנית. במצב כזה חלק מהדפדפנים באנדרואיד לא שומרים את האפליקציה ואת הנתונים אחרי שסוגרים את התצוגה. כדי שהאפליקציה תישאר זמינה, העלה את הקבצים ל-GitHub Pages או Netlify ואז הוסף למסך הבית.';
+          } else {
+            dom.runtimeNote.hidden = true;
+          }
+        }
+
+        if (navigator.storage && navigator.storage.persisted && navigator.storage.persist){
+          try {
+            const isPersisted = await navigator.storage.persisted();
+            if (!isPersisted) await navigator.storage.persist();
+          } catch (_) {}
+        }
+      }
+
+      async function installApp(){
+        if (deferredInstallPrompt){
+          deferredInstallPrompt.prompt();
+          try {
+            await deferredInstallPrompt.userChoice;
+          } catch (_) {}
+          return;
+        }
+
+        if (isStableAppOrigin()){
+          toast('אם הכפתור לא הופיע, אפשר לבחור בתפריט הדפדפן: הוספה למסך הבית.');
+        } else {
+          toast('כדי להתקין, צריך לפתוח את האפליקציה מכתובת https קבועה ולא מקובץ זמני.');
+        }
+      }
+
+      function addSingle(){
+        const value = dom.single.value.trim();
+        if (!value) return;
+        addBulk(value, dom.category.value);
+        dom.single.value = '';
+        dom.ghost.textContent = '';
+        dom.single.focus();
+      }
+
+      function splitInput(text){
+        const raw = String(text || '').trim();
+        if (!raw) return [];
+        if (/\r?\n/.test(raw)) return raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+        return raw.split(',').map(s=>s.trim()).filter(Boolean);
+      }
+
+      function parseLine(line, defaultCat){
+        let raw = String(line || '').trim();
+        if (!raw) return null;
+
+        raw = raw.replace(/^[\s•\-*]+/g, '').trim();
+        raw = raw.replace(/\s+/g, ' ');
+
+        let cat = defaultCat || '';
+        const catMatch = raw.match(/\[(.+?)\]\s*$/);
+        if (catMatch){
+          cat = catMatch[1].trim();
+          raw = raw.replace(/\[(.+?)\]\s*$/, '').trim();
+        }
+
+        let qty = 1;
+
+        const leadingQty = raw.match(/^(\d+(?:[\.,]\d+)*)\s+/);
+        if (leadingQty){
+          qty = Number(leadingQty[1].replace(',', '.'));
+          raw = raw.slice(leadingQty[0].length).trim();
+        }
+
+        const endQtyWithUnit = raw.match(/(?:\s*-\s*|\s+)(\d+(?:[\.,]\d+)*)\s*(חתיכות|יחידות|יחידה|בקבוקים|בקבוק|אריזות|אריזה|ק"ג|קג|גרם|ליטר|מ"ל|מל)\s*$/i);
+        if (endQtyWithUnit){
+          qty = Number(endQtyWithUnit[1].replace(',', '.'));
+          raw = raw.replace(endQtyWithUnit[0], '').trim();
+        } else {
+          const trailingQty = raw.match(/\s(\d+(?:[\.,]\d+)*)\s*$/);
+          if (trailingQty){
+            qty = Number(trailingQty[1].replace(',', '.'));
+            raw = raw.replace(trailingQty[0], '').trim();
+          }
+        }
+
+        const name = raw.replace(/\s*-\s*/g, ' ').trim();
+        if (!name) return null;
+
+        return {
+          id: uid(),
+          name,
+          qty: clampQty(qty),
+          cat,
+          done:false,
+          createdAt:now(),
+          updatedAt:now()
+        };
+      }
+
+      function dedupe(list){
+        const map = new Map();
+        for (const item of normalizeList(list)){
+          const key = `${item.name.toLowerCase()}||${(item.cat || '').toLowerCase()}`;
+          if (!map.has(key)){
+            map.set(key, { ...item });
+          } else {
+            const current = map.get(key);
+            current.qty = clampQty(current.qty + item.qty);
+            current.done = Boolean(current.done && item.done);
+            current.updatedAt = Math.max(current.updatedAt || 0, item.updatedAt || 0);
+          }
+        }
+        return Array.from(map.values());
+      }
+
+      function addBulk(text, defaultCat){
+        const lines = splitInput(text);
+        const items = [];
+        for (const line of lines){
+          const parsed = parseLine(line, defaultCat);
+          if (parsed) items.push(parsed);
+        }
+
+        if (!items.length){
+          toast('לא נמצאו פריטים תקינים להוספה.');
+          return;
+        }
+
+        state = dedupe(state.concat(items));
+        saveState();
+        persistSuggestions(items.map(item => item.name));
+        render();
+        toast(`נוספו ${items.length} פריטים.`);
+      }
+
+      function findItem(id){
+        return state.find(item => item.id === id);
+      }
+
+      function touch(item){
+        item.updatedAt = now();
+      }
+
+      function toggleDone(id){
+        const item = findItem(id);
+        if (!item) return;
+        item.done = !item.done;
+        touch(item);
+        saveState();
+        render();
+      }
+
+      function changeQty(id, delta){
+        const item = findItem(id);
+        if (!item) return;
+        item.qty = clampQty(item.qty + delta);
+        touch(item);
+        saveState();
+        render();
+      }
+
+      function editQty(id){
+        const item = findItem(id);
+        if (!item) return;
+        promptFn({
+          title:'עדכון כמות',
+          message:'הזן כמות חדשה:',
+          value:String(item.qty),
+          confirmText:'שמור',
+          cancelText:'ביטול',
+          onConfirm(value){
+            const numeric = Number(String(value).replace(',', '.'));
+            if (!Number.isFinite(numeric) || numeric <= 0){
+              toast('כמות לא תקינה.');
+              return false;
+            }
+            item.qty = clampQty(numeric);
+            touch(item);
+            saveState();
+            render();
+            return true;
+          }
+        });
+      }
+
+      function editName(id){
+        const item = findItem(id);
+        if (!item) return;
+        promptFn({
+          title:'עריכת פריט',
+          message:'עדכן את שם הפריט:',
+          value:item.name,
+          confirmText:'שמור',
+          cancelText:'ביטול',
+          onConfirm(value){
+            const nextName = String(value || '').trim();
+            if (!nextName){
+              toast('שם הפריט לא יכול להיות ריק.');
+              return false;
+            }
+            item.name = nextName;
+            touch(item);
+            state = dedupe(state);
+            saveState();
+            persistSuggestions([nextName]);
+            render();
+            return true;
+          }
+        });
+      }
+
+      function setCategory(id, cat){
+        const item = findItem(id);
+        if (!item) return;
+        item.cat = String(cat || '');
+        touch(item);
+        state = dedupe(state);
+        saveState();
+        render();
+      }
+
+      function removeItem(id){
+        const item = findItem(id);
+        if (!item) return;
+        confirmFn({
+          title:'מחיקת פריט',
+          message:`למחוק את הפריט "${item.name}"?`,
+          confirmText:'מחק',
+          cancelText:'ביטול',
+          danger:true,
+          onConfirm(){
+            state = state.filter(entry => entry.id !== id);
+            saveState();
+            render();
+            toast('הפריט נמחק.');
+          }
+        });
+      }
+
+      function clearDoneItems(){
+        const count = state.filter(item => item.done).length;
+        if (!count){
+          toast('אין פריטים שבוצעו למחיקה.');
+          return;
+        }
+        confirmFn({
+          title:'מחיקת פריטים שבוצעו',
+          message:`למחוק ${count} פריטים שסומנו כבוצעו?`,
+          confirmText:'מחק בוצעו',
+          cancelText:'ביטול',
+          danger:true,
+          onConfirm(){
+            state = state.filter(item => !item.done);
+            saveState();
+            render();
+            toast('הפריטים שסומנו כבוצעו נמחקו.');
+          }
+        });
+      }
+
+      function clearAll(){
+        if (!state.length){
+          toast('הרשימה כבר ריקה.');
+          return;
+        }
+        confirmFn({
+          title:'איפוס מלא',
+          message:`לאפס את כל הרשימה? כרגע יש ${state.length} פריטים.`,
+          confirmText:'איפוס מלא',
+          cancelText:'ביטול',
+          danger:true,
+          onConfirm(){
+            state = [];
+            saveState();
+            render();
+            toast('הרשימה אופסה.');
+          }
+        });
+      }
+
+      function persistSuggestions(names){
+        const prev = safeJsonParse(localStorage.getItem(SUG_KEY), []);
+        const merged = Array.from(new Set([...(Array.isArray(prev) ? prev : []), ...COMMON_ITEMS, ...state.map(item => item.name), ...(names || [])].filter(Boolean)));
+        suggestionsCache = merged;
+        localStorage.setItem(SUG_KEY, JSON.stringify(merged));
+        refreshDatalist();
+      }
+
+      function loadSuggestions(){
+        if (suggestionsCache) return suggestionsCache.slice();
+        const stored = safeJsonParse(localStorage.getItem(SUG_KEY), []);
+        suggestionsCache = Array.from(new Set([...(Array.isArray(stored) ? stored : []), ...COMMON_ITEMS, ...state.map(item => item.name)].filter(Boolean)));
+        return suggestionsCache.slice();
+      }
+
+      function refreshDatalist(){
+        const list = loadSuggestions().sort((a,b)=>a.localeCompare(b,'he'));
+        const frag = document.createDocumentFragment();
+        for (const name of list){
+          const opt = document.createElement('option');
+          opt.value = name;
+          frag.appendChild(opt);
+        }
+        dom.datalist.innerHTML = '';
+        dom.datalist.appendChild(frag);
+      }
+
+      function firstMatch(prefix){
+        const needle = String(prefix || '').trim().toLowerCase();
+        if (!needle) return '';
+        return loadSuggestions().find(item => String(item).toLowerCase().startsWith(needle)) || '';
+      }
+
+      function showGhost(prefix){
+        const match = firstMatch(prefix);
+        const raw = String(prefix || '').trim().toLowerCase();
+        dom.ghost.textContent = match && match.toLowerCase() !== raw ? match : '';
+      }
+
+      function acceptInlineCompletion(){
+        if (!dom.ghost.textContent) return false;
+        dom.single.value = dom.ghost.textContent;
+        dom.ghost.textContent = '';
+        return true;
+      }
+
+      function getFilteredItems(){
+        let list = state.slice();
+
+        const q = String(ui.search || '').trim().toLowerCase();
+        if (q){
+          list = list.filter(item => `${item.name} ${item.cat || ''}`.toLowerCase().includes(q));
+        }
+
+        if (ui.filter === 'open') list = list.filter(item => !item.done);
+        if (ui.filter === 'done') list = list.filter(item => item.done);
+
+        list.sort(compareItems);
+        return list;
+      }
+
+      function compareItems(a,b){
+        switch (ui.sort){
+          case 'oldest': return (a.createdAt || 0) - (b.createdAt || 0);
+          case 'name': return a.name.localeCompare(b.name,'he');
+          case 'qty-desc': return b.qty - a.qty;
+          case 'qty-asc': return a.qty - b.qty;
+          case 'newest':
+          default: return (b.createdAt || 0) - (a.createdAt || 0);
+        }
+      }
+
+      function groupItems(items){
+        if (ui.groupMode === 'flat') return [['כל הפריטים', items]];
+        const map = new Map();
+        for (const item of items){
+          const key = item.cat || 'ללא קטגוריה';
+          if (!map.has(key)) map.set(key, []);
+          map.get(key).push(item);
+        }
+        return Array.from(map.entries()).sort((a,b)=>a[0].localeCompare(b[0],'he'));
+      }
+
+      function render(){
+        const items = getFilteredItems();
+        const total = state.length;
+        const done = state.filter(item => item.done).length;
+        const open = total - done;
+        const categories = new Set(state.map(item => item.cat || 'ללא קטגוריה')).size;
+        const percent = total ? Math.round((done / total) * 100) : 0;
+
+        dom.statTotal.textContent = String(total);
+        dom.statDone.textContent = String(done);
+        dom.statOpen.textContent = String(open);
+        dom.statCats.textContent = String(total ? categories : 0);
+        dom.progressBar.style.width = `${percent}%`;
+        dom.progressLabel.textContent = `${percent}% הושלמו`;
+        dom.badge.textContent = String(items.length);
+        dom.btnClearDone.disabled = done === 0;
+
+        dom.root.innerHTML = '';
+
+        const isFilteredEmpty = total > 0 && items.length === 0;
+        dom.empty.style.display = items.length ? 'none' : 'block';
+        dom.empty.textContent = isFilteredEmpty ? 'לא נמצאו פריטים בהתאם לחיפוש או לסינון.' : 'אין פריטים ברשימה כרגע.';
+
+        if (!items.length) return;
+
+        const groups = groupItems(items);
+        const frag = document.createDocumentFragment();
+        for (const [groupName, groupItemsList] of groups){
+          frag.appendChild(renderGroup(groupName, groupItemsList));
+        }
+        dom.root.appendChild(frag);
+      }
+
+      function renderGroup(title, items){
+        const group = document.createElement('section');
+        group.className = 'group';
+
+        const head = document.createElement('div');
+        head.className = 'group-head';
+        head.innerHTML = `<div class="group-title">${escapeHtml(title)}</div><div class="group-count">${items.length} פריטים</div>`;
+
+        const list = document.createElement('ul');
+        list.className = 'list';
+        for (const item of items){
+          list.appendChild(renderItem(item));
+        }
+
+        group.append(head,list);
+        return group;
+      }
+
+      function renderItem(item){
+        const li = document.createElement('li');
+        li.className = 'item' + (item.done ? ' done' : '');
+        li.dataset.id = item.id;
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'check';
+        checkbox.checked = item.done;
+        checkbox.setAttribute('aria-label', 'סמן כבוצע');
+        checkbox.addEventListener('change', ()=>toggleDone(item.id));
+
+        const nameWrap = document.createElement('div');
+        nameWrap.className = 'name-wrap';
+
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = item.name;
+        name.title = 'לחץ לעריכה';
+        name.tabIndex = 0;
+        name.setAttribute('role', 'button');
+        name.addEventListener('click', ()=>editName(item.id));
+        name.addEventListener('keydown', e=>{
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            editName(item.id);
+          }
+        });
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.textContent = item.cat || 'ללא קטגוריה';
+
+        nameWrap.append(name, meta);
+
+        const qtyBox = document.createElement('div');
+        qtyBox.className = 'qty-box';
+
+        const minus = document.createElement('button');
+        minus.type = 'button';
+        minus.className = 'qty-btn';
+        minus.textContent = '-';
+        minus.title = 'הפחת כמות';
+        minus.addEventListener('click', ()=>changeQty(item.id, -1));
+
+        const qty = document.createElement('div');
+        qty.className = 'qty-value';
+        qty.textContent = String(item.qty);
+        qty.title = 'לחץ לעדכון ידני';
+        qty.tabIndex = 0;
+        qty.setAttribute('role', 'button');
+        qty.addEventListener('click', ()=>editQty(item.id));
+        qty.addEventListener('keydown', e=>{
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            editQty(item.id);
+          }
+        });
+
+        const plus = document.createElement('button');
+        plus.type = 'button';
+        plus.className = 'qty-btn';
+        plus.textContent = '+';
+        plus.title = 'הגדל כמות';
+        plus.addEventListener('click', ()=>changeQty(item.id, +1));
+
+        qtyBox.append(minus, qty, plus);
+
+        const catSelect = document.createElement('select');
+        catSelect.className = 'cat-select';
+        catSelect.setAttribute('aria-label', 'בחר קטגוריה לפריט');
+        for (const cat of CATEGORIES){
+          const option = document.createElement('option');
+          option.value = cat;
+          option.textContent = cat || 'ללא';
+          option.selected = cat === item.cat;
+          catSelect.appendChild(option);
+        }
+        catSelect.addEventListener('change', e=>setCategory(item.id, e.target.value));
+
+        const actions = document.createElement('div');
+        actions.className = 'item-actions';
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'danger';
+        remove.textContent = 'מחק';
+        remove.addEventListener('click', ()=>removeItem(item.id));
+        actions.appendChild(remove);
+
+        li.append(checkbox, nameWrap, qtyBox, catSelect, actions);
+        return li;
+      }
+
+      function exportData(){
+        if (!state.length){
+          toast('אין מה לייצא.');
+          return;
+        }
+
+        const lines = state.map(item => {
+          const qtyPrefix = item.qty > 1 ? `${item.qty} ` : '';
+          const cat = item.cat ? ` [${item.cat}]` : '';
+          const done = item.done ? ' (בוצע)' : '';
+          return `${qtyPrefix}${item.name}${cat}${done}`;
+        });
+
+        const text = lines.join('\n');
+
+        if (navigator.share){
+          navigator.share({ title:'רשימת קניות', text }).catch(()=>{});
+          return;
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text)
+            .then(()=>toast('הרשימה הועתקה ללוח.'))
+            .catch(()=>downloadText(text));
+          return;
+        }
+
+        downloadText(text);
+      }
+
+      function downloadText(text){
+        const blob = new Blob([text], { type:'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'shopping-list.txt';
+        a.click();
+        setTimeout(()=>URL.revokeObjectURL(url), 3000);
+        toast('הרשימה הורדה כקובץ.');
+      }
+
+      function debounce(fn, wait){
+        let t = null;
+        return function(){
+          clearTimeout(t);
+          const args = arguments;
+          t = setTimeout(()=>fn.apply(null, args), wait);
+        };
+      }
+
+      function toast(message){
+        const el = document.createElement('div');
+        el.className = 'toast';
+        el.textContent = message;
+        dom.toastStack.appendChild(el);
+        setTimeout(()=>{
+          el.style.opacity = '0';
+          setTimeout(()=>el.remove(), 200);
+        }, 2200);
+      }
+
+      function confirmDialog({ title, message, confirmText='אישור', cancelText='ביטול', onConfirm, danger=false }){
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h3 id="modal-title">${escapeHtml(title || 'אישור')}</h3>
+            <p>${escapeHtml(message || '')}</p>
+            <div class="toolbar" style="justify-content:flex-end">
+              <button type="button" class="ghost" data-cancel>${escapeHtml(cancelText)}</button>
+              <button type="button" class="${danger ? 'danger' : 'primary'}" data-confirm>${escapeHtml(confirmText)}</button>
+            </div>
+          </div>
+        `;
+
+        const cancel = overlay.querySelector('[data-cancel]');
+        const confirm = overlay.querySelector('[data-confirm]');
+
+        function close(){
+          document.removeEventListener('keydown', onKey);
+          overlay.remove();
+        }
+
+        function onKey(e){
+          if (e.key === 'Escape') close();
+        }
+
+        cancel.addEventListener('click', close);
+        confirm.addEventListener('click', ()=>{
+          onConfirm && onConfirm();
+          close();
+        });
+        overlay.addEventListener('click', e=>{ if (e.target === overlay) close(); });
+        document.addEventListener('keydown', onKey);
+        document.body.appendChild(overlay);
+        confirm.focus();
+      }
+
+      function promptDialog({ title, message, value='', confirmText='שמור', cancelText='ביטול', onConfirm }){
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h3 id="modal-title">${escapeHtml(title || 'עדכון')}</h3>
+            <p>${escapeHtml(message || '')}</p>
+            <input data-input value="${escapeAttr(value)}" />
+            <div class="toolbar" style="margin-top:14px;justify-content:flex-end">
+              <button type="button" class="ghost" data-cancel>${escapeHtml(cancelText)}</button>
+              <button type="button" class="primary" data-confirm>${escapeHtml(confirmText)}</button>
+            </div>
+          </div>
+        `;
+
+        const input = overlay.querySelector('[data-input]');
+        const cancel = overlay.querySelector('[data-cancel]');
+        const confirm = overlay.querySelector('[data-confirm]');
+
+        function close(){
+          document.removeEventListener('keydown', onKey);
+          overlay.remove();
+        }
+
+        function tryConfirm(){
+          const result = onConfirm ? onConfirm(input.value) : true;
+          if (result !== false) close();
+        }
+
+        function onKey(e){
+          if (e.key === 'Escape') close();
+          if (e.key === 'Enter') tryConfirm();
+        }
+
+        cancel.addEventListener('click', close);
+        confirm.addEventListener('click', tryConfirm);
+        overlay.addEventListener('click', e=>{ if (e.target === overlay) close(); });
+        document.addEventListener('keydown', onKey);
+        document.body.appendChild(overlay);
+        input.focus();
+        input.select();
+      }
+
+      function escapeHtml(value){
+        return String(value)
+          .replace(/&/g,'&amp;')
+          .replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;')
+          .replace(/"/g,'&quot;')
+          .replace(/'/g,'&#39;');
+      }
+
+      function escapeAttr(value){
+        return escapeHtml(String(value)).replace(/`/g,'&#96;');
+      }
+
+      function runTests(){
+        const logs = [];
+        function assert(name, cond, expected, actual){ logs.push({ name, pass:Boolean(cond), expected, actual }); }
+
+        let t = parseLine('ביצים','');
+        assert('parse basic name', t && t.name === 'ביצים' && t.qty === 1, 'name=ביצים qty=1', JSON.stringify(t));
+
+        t = parseLine('2 קמח ללחם מנופה','');
+        assert('parse leading qty', t && t.qty === 2 && t.name === 'קמח ללחם מנופה', 'qty=2', JSON.stringify(t));
+
+        t = parseLine('גבינה צהובה 9','');
+        assert('parse trailing qty', t && t.qty === 9 && t.name === 'גבינה צהובה', 'qty=9', JSON.stringify(t));
+
+        t = parseLine('דג סלמון - 6 חתיכות','');
+        assert('parse unit pattern', t && t.qty === 6 && t.name === 'דג סלמון', 'qty=6 name=דג סלמון', JSON.stringify(t));
+
+        t = parseLine('עגבניות [ירקות ופירות]','');
+        assert('parse inline category', t && t.cat === 'ירקות ופירות', 'cat=ירקות ופירות', JSON.stringify(t));
+
+        const deduped = dedupe([
+          { id:'a', name:'ביצים', qty:1, cat:'', done:false, createdAt:1, updatedAt:1 },
+          { id:'b', name:'ביצים', qty:2, cat:'', done:true, createdAt:2, updatedAt:2 }
+        ]);
+        assert('dedupe sums quantities', deduped.length === 1 && deduped[0].qty === 3, 'len=1 qty=3', JSON.stringify(deduped));
+
+        const originalState = state.slice();
+        const testId = uid();
+        state = originalState.concat([{ id:testId, name:'טסט', qty:1, cat:'', done:false, createdAt:now(), updatedAt:now() }]);
+        let called = false;
+        const oldConfirm = confirmFn;
+        confirmFn = ({ onConfirm })=>{ called = true; onConfirm && onConfirm(); };
+        removeItem(testId);
+        const removed = !state.find(item => item.id === testId);
+        confirmFn = oldConfirm;
+        state = originalState;
+        saveState();
+        assert('remove item after confirm', called && removed, 'called=true removed=true', `called=${called} removed=${removed}`);
+
+        const suggestions = loadSuggestions();
+        assert('suggestions exist', Array.isArray(suggestions) && suggestions.length > 0, 'non empty suggestions', suggestions.length);
+
+        const match = firstMatch('מ');
+        assert('autocomplete match exists', Boolean(match), 'non-empty match', match);
+
+        return logs;
+      }
+
+      function renderTestResults(results){
+        const pass = results.filter(r=>r.pass).length;
+        const fail = results.length - pass;
+        dom.testOut.innerHTML = `<div><strong>סיכום:</strong> ${pass} עברו, ${fail} נכשלו</div>` + results.map(r => `• ${r.pass ? '✅' : '❌'} ${escapeHtml(r.name)} <span class="muted">(ציפייה: ${escapeHtml(String(r.expected))})</span>`).join('<br>');
+      }
+    })();
+  </script>
+</body>
+</html>
